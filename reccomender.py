@@ -23,7 +23,7 @@ def combine_features(row):
         print "Error: ", row
 
 dataFrame["combined_features"] = dataFrame.apply(combine_features, axis=1)
-print "Combined Features:", dataFrame["combined_features"].head()
+# print "Combined Features:", dataFrame["combined_features"].head()
 
 
 #4 Create count matrix from the new combined column
@@ -33,7 +33,7 @@ count_matrix = cv.fit_transform(dataFrame["combined_features"])
 
 #5 Compute the Cosine Similarity based on the count_matrix
 cosine_sim = cosine_similarity(count_matrix)
-movie_user_likes = "Avatar"
+movie_user_likes = "The Avengers"
 
 
 #6 Get index of the movie from the title 
@@ -46,7 +46,7 @@ similar_movies = list(enumerate(cosine_sim[movie_index]))
 #7 Get a list of similar movies, in order of similarity score 
 sorted_similar_movies = sorted(similar_movies,key= lambda x:x[1], reverse=True)
 
-#8 Print titles of first 10 movies 
+#8 Print titles of first 20 movies 
 def get_title_from_index(index):
     return dataFrame[dataFrame.index == index]["title"].values[0]
 
@@ -56,3 +56,5 @@ for movie in sorted_similar_movies:
     i=i+1
     if i>10:
         break
+
+
