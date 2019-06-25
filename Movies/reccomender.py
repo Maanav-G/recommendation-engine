@@ -35,7 +35,7 @@ count_matrix = cv.fit_transform(dataFrame["combined_features"])
 #5 Compute the Cosine Similarity based on the count_matrix
 cosine_sim = cosine_similarity(count_matrix)
 
-movie_user_likes = "Avengers"
+movie_user_likes = "Avatar"
 
 #6 Get index of the movie from the title 
 def get_index_from_title(title):
@@ -61,5 +61,3 @@ for movie in sorted_similar_movies:
     i=i+1
     if i>10:
         break
-
-
