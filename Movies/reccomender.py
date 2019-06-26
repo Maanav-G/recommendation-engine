@@ -1,18 +1,22 @@
 import pandas as pd 
 import numpy as np
-from math import ceil, floor
 
+from math import ceil, floor
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity 
+from fuzzywuzzy import process 
 
 
-#1 CSV
+# Read CSV
 dataFrame = pd.read_csv("./dataset/movie_dataset.csv")
 
-#2 Features
+# Features
 features = ['keywords', 'cast', 'genres', 'director']
+# extracted titles only 
+titles = ['title']
 
-#3 Create a column in dataFrame which combines features
+
+# Create a column in dataFrame which combines features
 # replaced all "NaN"'s with " "
 for feature in features:
     dataFrame[feature] = dataFrame[feature].fillna(' ')
@@ -26,28 +30,47 @@ def combine_features(row):
 dataFrame["combined_features"] = dataFrame.apply(combine_features, axis=1)
 # print "Combined Features:", dataFrame["combined_features"].head()
 
+# created a titles only data frame
+for title in titles:
+    dataFrame[title] = dataFrame[title].fillna(' ')
 
-#4 Create count matrix from the new combined column
+def only_title(row):
+    try:
+        return row['title']
+    except:
+        print "Error: ", row
+
+dataFrame["only_titles"] = dataFrame.apply(only_title, axis=1)
+
+
+
+# Create count matrix from the new combined column
 cv = CountVectorizer()
 count_matrix = cv.fit_transform(dataFrame["combined_features"])
 
 
-#5 Compute the Cosine Similarity based on the count_matrix
+# Compute the Cosine Similarity based on the count_matrix
 cosine_sim = cosine_similarity(count_matrix)
 
-movie_user_likes = "Avatar"
+movie_user_inputted = "avengers"
+# returns similar matches from title database
+def get_matches(query, choices, limit=3):
+    results = process.extract(query, choices, limit=limit)
+    return results
+movie_user_likes = get_matches(movie_user_inputted, dataFrame["only_titles"])[0][0]
 
-#6 Get index of the movie from the title 
+
+# Get index of the movie from the title 
 def get_index_from_title(title):
     return dataFrame[dataFrame.title == title]["index"].values[0]
 
 movie_index = get_index_from_title(movie_user_likes)
 similar_movies = list(enumerate(cosine_sim[movie_index]))
 
-#7 Get a list of similar movies, in order of similarity score 
+# Get a list of similar movies, in order of similarity score 
 sorted_similar_movies = sorted(similar_movies,key= lambda x:x[1], reverse=True)
 
-#8 Print titles of first 20 movies 
+# Print titles of first 20 movies 
 def get_title_from_index(index):
     return dataFrame[dataFrame.index == index]["title"].values[0]
 
@@ -59,5 +82,5 @@ i=0
 for movie in sorted_similar_movies:
     print "Movie: ", get_title_from_index(movie[0]), "\n", "Similarity: ", round(float_round(movie[1], 3, ceil)*100), "%", "\n" 
     i=i+1
-    if i>10:
+    if i>20:
         break
