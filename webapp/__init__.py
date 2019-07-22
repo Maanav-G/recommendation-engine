@@ -1,10 +1,32 @@
+from flask import Flask
+from flask import render_template
+
+from datetime import datetime
+
+app  = Flask(__name__)
+
+@app.route("/")
+def index():
+    """ Renders list of movies
+    """
+    return render_template("index.html", 
+                            title="Reccomendation Engine",  
+                            movie_user_inputted = movie_user_inputted,
+                            )
+
+
+
+""" 
+    Model of reccomendation engine - start
+"""
 import pandas as pd 
 import numpy as np
-
+import pickle
 from math import ceil, floor
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity 
 from fuzzywuzzy import process 
+
 
 
 # Read CSV
@@ -52,7 +74,7 @@ count_matrix = cv.fit_transform(dataFrame["combined_features"])
 # Compute the Cosine Similarity based on the count_matrix
 cosine_sim = cosine_similarity(count_matrix)
 
-movie_user_inputted = "avengers"
+movie_user_inputted = "The Avenegers"
 # returns similar matches from title database
 def get_matches(query, choices, limit=3):
     results = process.extract(query, choices, limit=limit)
@@ -78,9 +100,22 @@ def get_title_from_index(index):
 def float_round(num, places = 0, direction = floor):
     return direction(num * (10**places)) / float(10**places)
 
+print movie_user_inputted
 i=0 
 for movie in sorted_similar_movies:
     print "Movie: ", get_title_from_index(movie[0]), "\n", "Similarity: ", round(float_round(movie[1], 3, ceil)*100), "%", "\n" 
     i=i+1
     if i>20:
         break
+
+
+
+""" 
+    Model of reccomendation engine - end
+"""
+
+
+
+if __name__=="__main__":
+	# app.run(threaded=True)
+	app.run(host="0.0.0.0", port=8080, threaded=True, debug=True)
