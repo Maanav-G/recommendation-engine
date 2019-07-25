@@ -1,8 +1,15 @@
 {% extends "layout.html" %}
 {% block body %}
 <body>
-    <div class="container">
-        {{ movie_user_inputted }}
+    <div class="container"><ul>
+
+            {% for movie in sorted_similar_movies %}
+            {% if loop.index <= 20 %}
+                <li>{{ get_title_from_index(movie[0]) }}</li>
+            {% endif %}
+            {% endfor %}
+            </ul>
+
     </div>
 </body>
 {% endblock %}
