@@ -30,17 +30,22 @@ def get_recommendations():
 
     i=0 
     movie_list = []
+
     for movie in sorted_similar_movies:
         movie_title = get_title_from_index(movie[0])
-        movie_list.append(movie_title)
-        # print ("Movie: " + get_title_from_index(movie[0]) + "\n" + "Similarity: " + "%" + "\n" )
+        similarity = round(float_round(movie[1], 3, ceil)*100)
+        data = [{
+            'title': movie_title,
+            'similarity': similarity
+        }]
+        movie_list.append(data)
         i=i+1
         if i>10:
             break
     return jsonify(movie_list)
 
 
-dataFrame = pd.read_csv("./dataset/movie_dataset.csv")
+dataFrame = pd.read_csv("./movie_dataset.csv")
 features = ['keywords', 'cast', 'genres', 'director']
 titles = ['title']
 
